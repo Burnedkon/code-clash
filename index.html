@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Code Clash Royale</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <h1>Code Clash Royale</h1>
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="signup()">Sign Up</button>
+    <button onclick="login()">Login</button>
+
+    <div id="game" style="display:none;">
+      <canvas id="gameCanvas" width="600" height="400"></canvas>
+      <div id="chatBox"></div>
+      <input type="text" id="chatInput" placeholder="Type...">
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <script src="game.js"></script>
+  </body>
+</html>
+
