@@ -1,26 +1,42 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Code Clash Royale</title>
-    <link rel="stylesheet" href="style.css">
-  </head>
-  <body>
-    <h1>Code Clash Royale</h1>
-    <input type="email" id="email" placeholder="Email">
-    <input type="password" id="password" placeholder="Password">
-    <button onclick="signup()">Sign Up</button>
-    <button onclick="login()">Login</button>
+<body>
+  <!-- Login -->
+  <input type="email" id="email" placeholder="Email">
+  <input type="password" id="password" placeholder="Password">
+  <button onclick="signup()">Sign Up</button>
+  <button onclick="login()">Login</button>
 
-    <div id="game" style="display:none;">
-      <canvas id="gameCanvas" width="600" height="400"></canvas>
-      <div id="chatBox"></div>
-      <input type="text" id="chatInput" placeholder="Type...">
+  <!-- Main UI -->
+  <div id="game" style="display:none;">
+
+    <!-- PLAY -->
+    <button onclick="joinMatch()">🎮 Play</button>
+    <button onclick="createPrivateGame()">Create Private Match</button>
+    
+    <!-- Friends -->
+    <div id="friendsList"></div>
+    <input type="text" id="friendEmail" placeholder="Friend's Email">
+    <button onclick="addFriend()">Add Friend</button>
+
+    <!-- Canvas -->
+    <canvas id="gameCanvas" width="800" height="500"></canvas>
+
+    <!-- Shop -->
+    <div id="shop">
+      <button onclick="buyGun()">Buy Gun (50 coins)</button>
+      <button onclick="buyPowerUp()">Buy Power-Up (30 coins)</button>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
-    <script src="game.js"></script>
-  </body>
-</html>
+    <!-- Chat -->
+    <div id="chatBox"></div>
+    <input type="text" id="chatInput" placeholder="Type...">
 
+    <!-- Leaderboard -->
+    <div id="leaderboard"></div>
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+  <script src="game.js"></script>
+</body>
