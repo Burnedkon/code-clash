@@ -2,58 +2,318 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Code Clash Royale</title>
-  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game: Battle Royale</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background-color: #1a1a1a;
+      color: #fff;
+      font-family: 'Press Start 2P', cursive;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    h1, h2 {
+      text-align: center;
+    }
+
+    input, button {
+      margin: 10px;
+      padding: 15px;
+      font-size: 1rem;
+      border-radius: 5px;
+      background-color: #333;
+      border: none;
+      color: #fff;
+    }
+
+    #game {
+      display: none;
+      text-align: center;
+    }
+
+    #chatBox {
+      margin: 20px;
+      height: 200px;
+      overflow-y: scroll;
+      background-color: #333;
+      padding: 10px;
+      width: 300px;
+      border-radius: 5px;
+    }
+
+    #friendsList, #leaderboard {
+      margin: 20px;
+      background-color: #333;
+      padding: 10px;
+      width: 300px;
+      border-radius: 5px;
+      color: #fff;
+    }
+
+    canvas {
+      border: 1px solid #fff;
+      margin-top: 20px;
+    }
+
+    .button-shop, .button-game {
+      background-color: #4CAF50;
+      color: white;
+      border-radius: 10px;
+      padding: 15px;
+      cursor: pointer;
+    }
+
+    .button-shop:hover, .button-game:hover {
+      background-color: #45a049;
+    }
+
+    .button-friends {
+      background-color: #ff6347;
+      color: white;
+      border-radius: 10px;
+      padding: 10px;
+    }
+
+    .button-friends:hover {
+      background-color: #ff4500;
+    }
+  </style>
 </head>
 <body>
 
   <!-- Login -->
-  <div id="loginBox">
-    <h1>🔥 Code Clash Royale 🔫</h1>
-    <input type="email" id="emailInput" placeholder="Email">
-    <input type="password" id="passwordInput" placeholder="Password">
+  <h1>Battle Royale Game</h1>
+  <div id="login">
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password">
     <button onclick="signup()">Sign Up</button>
     <button onclick="login()">Login</button>
   </div>
 
-  <!-- Game -->
-  <div id="game" style="display: none;">
-    <div id="topBar">
-      <button onclick="joinMatch()">🎮 Play</button>
-      <button onclick="createPrivateGame()">🔒 Private Match</button>
+  <!-- Main Game UI -->
+  <div id="game">
+    <h2>Welcome to the Battle Royale</h2>
+
+    <!-- Play -->
+    <button class="button-game" onclick="joinMatch()">🎮 Play</button>
+    <button class="button-game" onclick="createPrivateGame()">Create Private Match</button>
+
+    <!-- Friends -->
+    <div id="friendsList"></div>
+    <input type="text" id="friendEmail" placeholder="Friend's Email">
+    <button class="button-friends" onclick="addFriend()">Add Friend</button>
+
+    <!-- Shop -->
+    <div id="shop">
+      <button class="button-shop" onclick="buyGun()">Buy Gun (50 coins)</button>
+      <button class="button-shop" onclick="buyPowerUp()">Buy Power-Up (30 coins)</button>
     </div>
 
-    <div id="sidebar">
-      <h2>🧑‍🤝‍🧑 Friends</h2>
-      <div id="friendsList"></div>
-      <input type="text" id="friendEmail" placeholder="Friend's Email">
-      <button onclick="addFriend()">Add Friend</button>
+    <!-- Leaderboard -->
+    <div id="leaderboard"></div>
 
-      <h2>🛒 Shop</h2>
-      <button onclick="buyGun()">Buy Gun (50 coins)</button>
-      <button onclick="buyPowerUp()">Buy Power-Up (30 coins)</button>
-
-      <h2>🏆 Leaderboard</h2>
-      <div id="leaderboard"></div>
-
-      <h2>📊 Stats</h2>
-      <p>Kills: <span id="killCount">0</span></p>
-      <p>Coins: <span id="coinCount">0</span></p>
-    </div>
-
+    <!-- Chat -->
+    <div id="chatBox"></div>
+    <input type="text" id="chatInput" placeholder="Type message..." onkeyup="sendChat(event)">
+    
+    <!-- Canvas -->
     <canvas id="gameCanvas" width="800" height="500"></canvas>
-
-    <div id="chatArea">
-      <div id="chatBox"></div>
-      <input type="text" id="chatInput" placeholder="Type and press Enter...">
-    </div>
   </div>
 
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
-  <script src="game.js"></script>
+
+  <script>
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyDpeT73fOAYADnV5CPSgINSlWVyXZE9cjg",
+  authDomain: "code-clash-royale.firebaseapp.com",
+  databaseURL: "https://code-clash-royale-default-rtdb.firebaseio.com",
+  projectId: "code-clash-royale",
+  storageBucket: "code-clash-royale.firebasestorage.app",
+  messagingSenderId: "830102918327",
+  appId: "1:830102918327:web:719af83564999094e2a932",
+  measurementId: "G-14D9SQ9EZR"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+
+    let playerData = {
+      name: "Player1",
+      kills: 0,
+      coins: 0,
+      health: 100,
+      position: { x: 0, y: 0 },
+      gameId: "",
+      gun: null,  // Weapon the player has equipped
+      speed: 5,  // Movement speed
+    };
+
+    let currentPlayerId = "";
+    let playerRef = null;
+    let gameRef = null;
+    let bullets = [];
+    let lastBulletTime = 0;
+    const bulletSpeed = 10;
+
+    function signup() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      auth.createUserWithEmailAndPassword(email, password).then((userCredential) => {
+        currentPlayerId = userCredential.user.uid;
+        alert("Signup successful!");
+        showGameUI();
+      }).catch((error) => {
+        alert("Error: " + error.message);
+      });
+    }
+
+    function login() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      auth.signInWithEmailAndPassword(email, password).then((userCredential) => {
+        currentPlayerId = userCredential.user.uid;
+        alert("Login successful!");
+        showGameUI();
+      }).catch((error) => {
+        alert("Error: " + error.message);
+      });
+    }
+
+    function showGameUI() {
+      document.getElementById("login").style.display = "none";
+      document.getElementById("game").style.display = "block";
+      playerRef = db.ref('players/' + currentPlayerId);
+      playerRef.set(playerData);
+    }
+
+    // Multiplayer Actions
+    function createPrivateGame() {
+      const gameId = prompt("Enter Game ID to create");
+      playerData.gameId = gameId;
+      playerRef.update(playerData);
+      alert(`Game Created! Share this Game ID: ${gameId}`);
+    }
+
+    function joinMatch() {
+      const gameId = prompt("Enter Game ID to join");
+      playerData.gameId = gameId;
+      playerRef.update(playerData);
+      alert(`Joining Game: ${gameId}`);
+    }
+
+    // Friend System
+    function addFriend() {
+      const friendEmail = document.getElementById("friendEmail").value;
+      // Firebase logic to add friends
+    }
+
+    // Buy items
+    function buyGun() {
+      if (playerData.coins >= 50) {
+        playerData.coins -= 50;
+        playerData.gun = "Pistol";
+        alert("Gun purchased: Pistol!");
+        playerRef.update(playerData);
+      } else {
+        alert("Not enough coins!");
+      }
+    }
+
+    function buyPowerUp() {
+      if (playerData.coins >= 30) {
+        playerData.coins -= 30;
+        alert("Power-Up purchased!");
+        playerRef.update(playerData);
+      } else {
+        alert("Not enough coins!");
+      }
+    }
+
+    // Chat System
+    function sendChat(event) {
+      if (event.key === 'Enter') {
+        const message = document.getElementById("chatInput").value;
+        db.ref('chat/' + playerData.gameId).push({ name: playerData.name, message: message });
+        document.getElementById("chatInput").value = '';
+      }
+    }
+
+    db.ref('chat/' + playerData.gameId).on('child_added', (snapshot) => {
+      const message = snapshot.val();
+      chatBox.innerHTML += `<p><strong>${message.name}: </strong>${message.message}</p>`;
+    });
+
+    // Real-Time Syncing of Player Positions
+    function syncPlayerPosition() {
+      playerRef.update({
+        position: playerData.position,
+        health: playerData.health,
+      });
+    }
+
+    // Handling Bullet Firing
+    function shootBullet() {
+      if (playerData.gun && Date.now() - lastBulletTime > 500) {  // Basic cooldown for shooting
+        bullets.push({
+          x: playerData.position.x,
+          y: playerData.position.y,
+          direction: "right",  // You can add movement direction based on mouse or keyboard input
+        });
+        lastBulletTime = Date.now();
+        alert("Bang!");
+      }
+    }
+
+    function updateBullets() {
+      for (let i = 0; i < bullets.length; i++) {
+        bullets[i].x += bulletSpeed;  // Move the bullet
+        if (bullets[i].x > 800) {  // Remove bullets if out of bounds
+          bullets.splice(i, 1);
+        }
+      }
+    }
+
+    function renderGame() {
+      const canvas = document.getElementById("gameCanvas");
+      const ctx = canvas.getContext("2d");
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // Draw player, bullets, enemies, etc.
+      ctx.fillStyle = "red";
+      ctx.fillRect(playerData.position.x, playerData.position.y, 20, 20); // Draw player
+
+      updateBullets(); // Update bullet positions
+
+      for (let bullet of bullets) {
+        ctx.fillStyle = "yellow";
+        ctx.fillRect(bullet.x, bullet.y, 5, 5);
+      }
+
+      requestAnimationFrame(renderGame);
+    }
+
+    renderGame();  // Start the game loop
+
+  </script>
+
 </body>
 </html>
 
