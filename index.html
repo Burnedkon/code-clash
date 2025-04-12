@@ -1,185 +1,158 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Game with Firebase Authentication</title>
-  <link rel="stylesheet" href="style.css">
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-analytics.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Code Clash Royale</title>
+  <style>
+    body {
+      font-family: 'Courier New', monospace;
+      background-color: #1c1c1c;
+      color: #00ff00;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+    h1, h3 {
+      text-shadow: 2px 2px 5px #000;
+    }
+    input, button {
+      margin: 10px;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #00ff00;
+      background-color: #333;
+      color: #fff;
+      font-size: 16px;
+    }
+    button:hover {
+      background-color: #00ff00;
+      cursor: pointer;
+    }
+    .screen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 50px;
+    }
+    #gameCanvas {
+      border: 2px solid #fff;
+      background-color: #000;
+    }
+    #avatar-customization, #shop, #friendsList, #leaderboard {
+      margin: 20px;
+    }
+    #friendsList div, #leaderboard div {
+      padding: 5px;
+      border-bottom: 1px solid #00ff00;
+    }
+  </style>
 </head>
 <body>
-  <!-- Login UI -->
-  <div id="login">
-    <input type="email" id="email" placeholder="Email">
-    <input type="password" id="password" placeholder="Password">
-    <button onclick="login()">Login</button>
-    <button onclick="signup()">Sign Up</button>
-    <p id="error-message"></p>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
+  <!-- Login Screen -->
+  <div id="login-screen" class="="screen" style="display: flex;">
+    <h1>Code Clash Royale</h1>
+    <input type="email" id="email" placeholder="Email" />
+    <input type="password" id="password" placeholder="Password" />
+    <button onclick="signUp()">Sign Up</button>
+    <button onclick="logIn()">Log In</button>
+    <p id="auth-message"></p>
   </div>
 
-  <!-- Game UI -->
-  <div id="game" style="display:none;">
-    <button onclick="joinMatch()">🎮 Play</button>
-    <button onclick="createPrivateGame()">Create Private Match</button>
-    
-    <!-- Friends -->
-    <div id="friendsList"></div>
-    <input type="text" id="friendEmail" placeholder="Friend's Email">
-    <button onclick="addFriend()">Add Friend</button>
+  <!-- Game Screen -->
+  <div id="game-screen" class="screen">
+    <button onclick="logOut()">Log Out</button>
 
-    <!-- Canvas -->
-    <canvas id="gameCanvas" width="800" height="500"></canvas>
+    <!-- Avatar Customization -->
+    <div id="avatar-customization">
+      <h3>Customize Avatar</h3>
+      <button onclick="changeAvatar('red')">Red</button>
+      <button onclick="changeAvatar('blue')">Blue</button>
+    </div>
+
+    <!-- Game Canvas -->
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
 
     <!-- Shop -->
     <div id="shop">
+      <h3>Shop</h3>
       <button onclick="buyGun()">Buy Gun (50 coins)</button>
       <button onclick="buyPowerUp()">Buy Power-Up (30 coins)</button>
     </div>
 
-    <!-- Chat -->
-    <div id="chatBox"></div>
-    <input type="text" id="chatInput" placeholder="Type...">
+    <!-- Friends System -->
+    <div>
+      <h3>Friends</h3>
+      <input type="text" id="friendEmail" placeholder="Friend's Email">
+      <button onclick="addFriend()">Add Friend</button>
+      <div id="friendsList"></div>
+    </div>
+
+    <!-- Leaderboard -->
+    <div id="leaderboard">
+      <h3>Leaderboard</h3>
+      <div id="leaderboardList"></div>
+    </div>
   </div>
 
   <script>
-    // Firebase configuration
+    // Firebase Configuration
     const firebaseConfig = {
-      apiKey: "AIzaSyDpeT73fOAYADnV5CPSgINSlWVyXZE9cjg",
-      authDomain: "code-clash-royale.firebaseapp.com",
-      databaseURL: "https://code-clash-royale-default-rtdb.firebaseio.com",
-      projectId: "code-clash-royale",
-      storageBucket: "code-clash-royale.firebasestorage.app",
-      messagingSenderId: "830102918327",
-      appId: "1:830102918327:web:719af83564999094e2a932",
-      measurementId: "G-14D9SQ9EZR"
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      databaseURL: "YOUR_DATABASE_URL",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_STORAGE_BUCKET",
+      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+      appId: "YOUR_APP_ID",
+      measurementId: "YOUR_MEASUREMENT_ID"
     };
 
     // Initialize Firebase
-    const app = firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+    firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
+    const db = firebase.database();
 
-    // Player data (example)
-    let player = {
-      email: '',
-      health: 100,
-      coins: 0,
-      kills: 0,
-      position: { x: 0, y: 0 },
-      gun: 'Basic Gun',
-    };
+    // Variables
+    let currentUser = null;
+    let playerDataRef = null;
+    let gameCanvas = document.getElementById('gameCanvas');
+    let ctx = gameCanvas.getContext('2d');
+    let player = { x: 100, y: 100, health: 100, coins: 0, kills: 0, avatar: 'red' };
+    let bullets = [];
+    let friendsList = [];
 
-    // Function to sign up
-    function signup() {
+    // Authentication Functions
+    function signUp() {
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
-
       auth.createUserWithEmailAndPassword(email, password)
-        .then(() => {
-          document.getElementById('error-message').innerText = 'Signup successful!';
-          savePlayerData(email);
-          toggleGameUI();
+        .then(userCredential => {
+          currentUser = userCredential.user;
+          playerDataRef = db.ref('players/' + currentUser.uid);
+          playerDataRef.set({
+            x: player.x,
+            y: player.y,
+            health: player.health,
+            coins: player.coins,
+            kills: player.kills,
+            avatar: player.avatar
+          });
+          toggleScreens();
+          setupGame();
         })
-        .catch((error) => {
-          document.getElementById('error-message').innerText = error.message;
+        .catch(error => {
+          document.getElementById('auth-message').innerText = error.message;
         });
     }
 
-    // Function to log in
-    function login() {
+    function logIn() {
       const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-
-      auth.signInWithEmailAndPassword(email, password)
-        .then(() => {
-          document.getElementById('error-message').innerText = 'Login successful!';
-          savePlayerData(email);
-          toggleGameUI();
-        })
-        .catch((error) => {
-          document.getElementById('error-message').innerText = error.message;
-        });
-    }
-
-    // Function to save player data to Firebase
-    function savePlayerData(email) {
-      db.ref('players/' + email.replace('.', '_')).set({
-        email: email,
-        health: 100,
-        coins: 0,
-        kills: 0
-      });
-    }
-
-    // Function to toggle between login and game UI
-    function toggleGameUI() {
-      document.getElementById('login').style.display = 'none';
-      document.getElementById('game').style.display = 'block';
-    }
-
-    // Function to start a match
-    function joinMatch() {
-      alert("Joining Match...");
-    }
-
-    // Create private game logic (just an example, you should implement a match-making system)
-    function createPrivateGame() {
-      alert("Private game created! Share this match code with your friends.");
-    }
-
-    // Add friend functionality (using Firebase Database)
-    function addFriend() {
-      const friendEmail = document.getElementById('friendEmail').value;
-      const currentUser = auth.currentUser.email.replace('.', '_');
-      
-      db.ref('friends/' + currentUser).push(friendEmail).then(() => {
-        alert('Friend added!');
-        updateFriendsList(currentUser);
-      });
-    }
-
-    // Update friends list
-    function updateFriendsList(userEmail) {
-      db.ref('friends/' + userEmail).once('value').then((snapshot) => {
-        let friends = snapshot.val();
-        const friendsList = document.getElementById('friendsList');
-        friendsList.innerHTML = '<h3>Friends:</h3>';
-        
-        for (let key in friends) {
-          let li = document.createElement('li');
-          li.innerText = friends[key];
-          friendsList.appendChild(li);
-        }
-      });
-    }
-
-    // Example of player movement and rendering on canvas
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
-    let playerX = 100;
-    let playerY = 100;
-
-    function renderGame() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = 'blue';
-      ctx.fillRect(playerX, playerY, 50, 50);
-      requestAnimationFrame(renderGame);
-    }
-
-    // Keydown event for player movement
-    window.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowUp') playerY -= 10;
-      if (e.key === 'ArrowDown') playerY += 10;
-      if (e.key === 'ArrowLeft') playerX -= 10;
-      if (e.key === 'ArrowRight') playerX += 10;
-    });
-
-    // Start rendering the game
-    renderGame();
-  </script>
-</body>
-</html>
+      const password = document.getElementById('password').value
+::contentReference[oaicite:22]{index=22}
+ 
