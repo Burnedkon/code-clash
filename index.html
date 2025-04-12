@@ -1,37 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Code Clash Royale</title>
+  <link rel="stylesheet" href="style.css">
+</head>
 <body>
+
   <!-- Login -->
-  <input type="email" id="email" placeholder="Email">
-  <input type="password" id="password" placeholder="Password">
-  <button onclick="signup()">Sign Up</button>
-  <button onclick="login()">Login</button>
+  <div id="loginBox">
+    <h1>🔥 Code Clash Royale 🔫</h1>
+    <input type="email" id="emailInput" placeholder="Email">
+    <input type="password" id="passwordInput" placeholder="Password">
+    <button onclick="signup()">Sign Up</button>
+    <button onclick="login()">Login</button>
+  </div>
 
-  <!-- Main UI -->
-  <div id="game" style="display:none;">
-
-    <!-- PLAY -->
-    <button onclick="joinMatch()">🎮 Play</button>
-    <button onclick="createPrivateGame()">Create Private Match</button>
-    
-    <!-- Friends -->
-    <div id="friendsList"></div>
-    <input type="text" id="friendEmail" placeholder="Friend's Email">
-    <button onclick="addFriend()">Add Friend</button>
-
-    <!-- Canvas -->
-    <canvas id="gameCanvas" width="800" height="500"></canvas>
-
-    <!-- Shop -->
-    <div id="shop">
-      <button onclick="buyGun()">Buy Gun (50 coins)</button>
-      <button onclick="buyPowerUp()">Buy Power-Up (30 coins)</button>
+  <!-- Game -->
+  <div id="game" style="display: none;">
+    <div id="topBar">
+      <button onclick="joinMatch()">🎮 Play</button>
+      <button onclick="createPrivateGame()">🔒 Private Match</button>
     </div>
 
-    <!-- Chat -->
-    <div id="chatBox"></div>
-    <input type="text" id="chatInput" placeholder="Type...">
+    <div id="sidebar">
+      <h2>🧑‍🤝‍🧑 Friends</h2>
+      <div id="friendsList"></div>
+      <input type="text" id="friendEmail" placeholder="Friend's Email">
+      <button onclick="addFriend()">Add Friend</button>
 
-    <!-- Leaderboard -->
-    <div id="leaderboard"></div>
+      <h2>🛒 Shop</h2>
+      <button onclick="buyGun()">Buy Gun (50 coins)</button>
+      <button onclick="buyPowerUp()">Buy Power-Up (30 coins)</button>
+
+      <h2>🏆 Leaderboard</h2>
+      <div id="leaderboard"></div>
+    </div>
+
+    <canvas id="gameCanvas" width="800" height="500"></canvas>
+
+    <div id="chatArea">
+      <div id="chatBox"></div>
+      <input type="text" id="chatInput" placeholder="Type and press Enter...">
+    </div>
   </div>
 
   <!-- Firebase SDKs -->
@@ -40,3 +51,4 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
   <script src="game.js"></script>
 </body>
+</html>
