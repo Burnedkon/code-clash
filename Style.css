@@ -16,13 +16,13 @@ body {
   transform: translate(-50%, -50%);
   background: #222;
   padding: 40px;
-  border: 2px solid #00f0ff;
+  border: 2px solid #e1b8e1;
   border-radius: 10px;
   text-align: center;
 }
 
 #loginBox h1 {
-  color: #00f0ff;
+  color: #e1b8e1;
   margin-bottom: 20px;
 }
 
@@ -36,11 +36,11 @@ input, button {
 }
 
 button {
-  background: #00f0ff;
+  background: #e1b8e1;
   color: black;
   cursor: pointer;
   transition: 0.2s;
-  box-shadow: 0 0 5px #00f0ff, 0 0 15px #00f0ff;
+  box-shadow: 0 0 5px #e1b8e1, 0 0 15px #e1b8e1;
 }
 
 button:hover {
@@ -63,7 +63,7 @@ button:hover {
 
 #gameCanvas {
   background: #222;
-  border: 2px solid #00f0ff;
+  border: 2px solid #e1b8e1;
   margin: 20px;
 }
 
@@ -89,6 +89,29 @@ button:hover {
   background: #000;
   padding: 10px;
   font-size: 12px;
-  border: 1px solid #00f0ff;
+  border: 1px solid #e1b8e1;
   margin-bottom: 5px;
+}
+
+h2 {
+  color: #e1b8e1;
+}
+
+#friendEmail {
+  background-color: #333;
+  color: white;
+}
+
+#friendEmail::placeholder {
+  color: #ccc;
+}
+
+#killCount, #coinCount {
+  color: #ffdb58;
+}
+
+input[type="text"], input[type="password"] {
+  background-color: #333;
+  color: white;
+  border-radius: 5px;
 }
