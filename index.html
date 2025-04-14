@@ -2019,11 +2019,11 @@
                 }
                 
                 // Calculate bullet position
-                const time = (Date.now() - bullet.timestamp) / 1000;
+                const time = (Date.now() - bullet.timestamp) / 10;
                 const distance = bullet.speed * time;
                 const bulletX = bullet.x + Math.cos(bullet.angle) * distance;
                 const bulletY = bullet.y + Math.sin(bullet.angle) * distance;
-                
+            
                 // Check if bullet is in range
                 if (distance > bullet.range) {
                     continue;
